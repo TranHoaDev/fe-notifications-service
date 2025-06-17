@@ -12,7 +12,7 @@ public class GraphProperties {
     private String clientSecret;
     private String tenantId;
     private String redirectUri;
-    private String scope = "User.Read Chat.ReadWrite ChatMessage.Send offline_access";
-    private int tokenBufferMinutes = 5;
-    private int refreshTokenDays = 90;
+    private String scope;
+    private int tokenBufferMinutes;
+    private int refreshTokenDays;
 }
