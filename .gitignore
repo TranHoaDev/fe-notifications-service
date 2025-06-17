@@ -13,7 +13,7 @@ target/
 *.ipr
 
 # Environment variables
-/.env
+.env
 
 ### Eclipse ###
 .apt_generated
