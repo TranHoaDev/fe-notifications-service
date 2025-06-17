@@ -11,7 +11,9 @@ target/
 *.iws
 *.iml
 *.ipr
-*.env
+
+# Environment variables
+/.env
 
 ### Eclipse ###
 .apt_generated
