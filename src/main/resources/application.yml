@@ -10,4 +10,4 @@ microsoft:
 
 logging:
   level:
-    com.company.teams: DEBUG
+    com.fecredit.gbg: DEBUG
