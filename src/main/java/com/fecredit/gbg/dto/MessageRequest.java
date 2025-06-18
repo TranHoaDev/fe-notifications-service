@@ -5,8 +5,8 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 public class MessageRequest {
-    @NotBlank
+    @NotBlank(message = "Chat ID cannot be blank")
     private String chatId;
-    @NotBlank
+    @NotBlank(message = "Content cannot be blank")
     private String content;
 }
