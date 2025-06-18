@@ -68,7 +68,7 @@ public class MicrosoftGraphTokenManager implements TokenManager {
                     .minusMinutes(5);
         } catch (Exception e) {
             log.warn("Failed to extract expiry from token, using default", e);
-            return LocalDateTime.now().plusHours(1).minusMinutes(5);
+            return LocalDateTime.now(ZoneOffset.UTC).plusHours(1).minusMinutes(5);
         }
     }
 
@@ -153,12 +153,12 @@ public class MicrosoftGraphTokenManager implements TokenManager {
 
     private void updateTokens(TokenResponse response) {
         this.delegatedToken = response.getAccessToken();
-        this.tokenExpiry = LocalDateTime.now()
+        this.tokenExpiry = LocalDateTime.now(ZoneOffset.UTC)
                 .plusSeconds(response.getExpiresIn() - (graphProperties.getTokenBufferMinutes() * 60));
 
         if (response.getRefreshToken() != null) {
             this.refreshToken = response.getRefreshToken();
-            this.refreshTokenExpiry = LocalDateTime.now().plusDays(graphProperties.getRefreshTokenDays());
+            this.refreshTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).plusDays(graphProperties.getRefreshTokenDays());
         }
 
         log.debug("Tokens updated - expires at: {}", tokenExpiry);
@@ -167,13 +167,13 @@ public class MicrosoftGraphTokenManager implements TokenManager {
     private boolean isTokenValid() {
         return delegatedToken != null &&
                 tokenExpiry != null &&
-                LocalDateTime.now().isBefore(tokenExpiry);
+                LocalDateTime.now(ZoneOffset.UTC).isBefore(tokenExpiry);
     }
 
     private boolean canRefreshToken() {
         return refreshToken != null &&
                 refreshTokenExpiry != null &&
-                LocalDateTime.now().isBefore(refreshTokenExpiry);
+                LocalDateTime.now(ZoneOffset.UTC).isBefore(refreshTokenExpiry);
     }
 
     @Override
@@ -205,7 +205,7 @@ public class MicrosoftGraphTokenManager implements TokenManager {
                 .accessTokenExpiresAt(tokenExpiry)
                 .refreshTokenExpiresAt(refreshTokenExpiry)
                 .minutesUntilExpiry(tokenExpiry != null ?
-                        ChronoUnit.MINUTES.between(LocalDateTime.now(), tokenExpiry) : -1)
+                        ChronoUnit.MINUTES.between(LocalDateTime.now(ZoneOffset.UTC), tokenExpiry) : -1)
                 .build();
     }
 
