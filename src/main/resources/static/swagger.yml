@@ -1,0 +1,268 @@
+openapi: 3.0.3
+info:
+  title: Microsoft Teams Notification API
+  description: RESTful API for sending notifications to Microsoft Teams via Graph API
+  version: 1.0.0
+  contact:
+    name: FE Credit GBG Team
+    email: gbg@fecredit.com
+    url: https://fecredit.com
+  license:
+    name: Internal Use Only
+    url: https://fecredit.com/license
+
+servers:
+  - url: http://localhost:8080
+    description: Development Server
+  - url: https://teams-api.fecredit.com
+    description: Production Server
+
+tags:
+  - name: Teams Messaging
+    description: Operations for sending messages to Teams
+  - name: Authentication
+    description: Token management and OAuth2 authentication
+  - name: Monitoring
+    description: Health checks and system status
+
+paths:
+  /api/teams/send-message:
+    post:
+      tags:
+        - Teams Messaging
+      summary: Send message to Teams chat
+      description: Sends a text message to a specific Microsoft Teams chat using Graph API
+      operationId: sendMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageRequest'
+            examples:
+              sample_message:
+                summary: Sample message
+                value:
+                  chatId: "19:meeting_abc123@thread.v2"
+                  content: "Hello from Teams API!"
+      responses:
+        '200':
+          description: Message sent successfully
+          content:
+            text/plain:
+              example: "Message sent successfully"
+        '400':
+          description: Invalid request parameters
+          content:
+            text/plain:
+              example: "Validation failed: chatId cannot be blank"
+        '401':
+          description: Authentication required
+          content:
+            text/plain:
+              example: "Authentication required: https://login.microsoftonline.com/..."
+        '500':
+          description: Internal server error
+          content:
+            text/plain:
+              example: "Failed to send message: Connection timeout"
+
+  /api/teams/auth/set-tokens:
+    post:
+      tags:
+        - Authentication
+      summary: Set authentication tokens manually
+      description: Manually configure access and refresh tokens for Microsoft Graph API
+      operationId: setTokensManually
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetTokensRequest'
+            examples:
+              token_setup:
+                summary: Token setup
+                value:
+                  accessToken: "eyJ0eXAiOiJKV1QiLCJub25jZSI6..."
+                  refreshToken: "0.AXoA1cOJ2_SDQhVVT..."
+      responses:
+        '200':
+          description: Tokens set successfully
+          content:
+            text/plain:
+              example: "Tokens set successfully"
+        '400':
+          description: Invalid token format
+          content:
+            text/plain:
+              example: "Failed to set tokens: Refresh token is required"
+
+  /api/teams/auth/callback:
+    get:
+      tags:
+        - Authentication
+      summary: OAuth2 callback handler
+      description: Handles OAuth2 authorization callback from Microsoft
+      operationId: handleCallback
+      parameters:
+        - name: code
+          in: query
+          required: true
+          description: Authorization code from Microsoft OAuth2 flow
+          schema:
+            type: string
+          example: "0.AXoA1cOJ2_SDQhVVT4XHNjbW..."
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            text/plain:
+              example: "Authentication successful"
+        '400':
+          description: Authentication failed
+          content:
+            text/plain:
+              example: "Authentication failed: Invalid authorization code"
+
+  /api/teams/token/status:
+    get:
+      tags:
+        - Authentication
+      summary: Get token status
+      description: Retrieves current authentication token status
+      operationId: getTokenStatus
+      responses:
+        '200':
+          description: Token status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenStatus'
+              examples:
+                valid_tokens:
+                  summary: Valid tokens
+                  value:
+                    hasValidAccessToken: true
+                    hasValidRefreshToken: true
+                    accessTokenExpiresAt: "2025-06-18T18:35:04.158"
+                    refreshTokenExpiresAt: "2025-09-16T11:35:04.158"
+                    minutesUntilExpiry: 55
+
+  /api/teams/auth/logout:
+    delete:
+      tags:
+        - Authentication
+      summary: Clear authentication tokens
+      description: Clears all stored authentication tokens
+      operationId: logout
+      responses:
+        '200':
+          description: Logged out successfully
+          content:
+            text/plain:
+              example: "Logged out successfully"
+
+  /api/health/status:
+    get:
+      tags:
+        - Monitoring
+      summary: Get system health status
+      description: Returns overall system health including authentication status
+      operationId: getSystemStatus
+      responses:
+        '200':
+          description: System status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+              examples:
+                healthy_system:
+                  summary: Healthy system
+                  value:
+                    status: "UP"
+                    timestamp: "2025-06-18T11:35:04.158"
+                    authentication:
+                      hasValidTokens: true
+                      minutesUntilExpiry: 55
+
+components:
+  schemas:
+    MessageRequest:
+      type: object
+      required:
+        - chatId
+        - content
+      properties:
+        chatId:
+          type: string
+          description: Microsoft Teams chat ID where the message will be sent
+          example: "19:meeting_abc123@thread.v2"
+        content:
+          type: string
+          description: Message content to be sent to the chat
+          example: "Hello from Teams API!"
+          maxLength: 4000
+
+    SetTokensRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+          description: Microsoft Graph access token (JWT format)
+          example: "eyJ0eXAiOiJKV1QiLCJub25jZSI6..."
+        refreshToken:
+          type: string
+          description: Microsoft Graph refresh token
+          example: "0.AXoA1cOJ2_SDQhVVT4XHNjbW..."
+
+    TokenStatus:
+      type: object
+      properties:
+        hasValidAccessToken:
+          type: boolean
+          description: Whether the current access token is valid
+          example: true
+        hasValidRefreshToken:
+          type: boolean
+          description: Whether the refresh token is valid
+          example: true
+        accessTokenExpiresAt:
+          type: string
+          format: date-time
+          description: Access token expiration time in UTC
+          example: "2025-06-18T18:35:04.158"
+        refreshTokenExpiresAt:
+          type: string
+          format: date-time
+          description: Refresh token expiration time in UTC
+          example: "2025-09-16T11:35:04.158"
+        minutesUntilExpiry:
+          type: integer
+          description: Minutes until access token expires
+          example: 55
+
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Overall system status
+          example: "UP"
+        timestamp:
+          type: string
+          format: date-time
+          description: Status check timestamp
+          example: "2025-06-18T11:35:04.158"
+        authentication:
+          type: object
+          properties:
+            hasValidTokens:
+              type: boolean
+              example: true
+            minutesUntilExpiry:
+              type: integer
+              example: 55

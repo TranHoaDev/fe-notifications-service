@@ -8,6 +8,21 @@ microsoft:
     token-buffer-minutes: 5
     refresh-token-days: 90
 
+# SpringDoc with external swagger.yml
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    # Point to external swagger.yml
+    url: /swagger.yml
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+  show-actuator: false
+
 logging:
   level:
     com.fecredit.gbg: DEBUG
