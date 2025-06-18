@@ -1,9 +1,9 @@
 microsoft:
   graph:
-    client-id: ${MICROSOFT_CLIENT_ID:c1356023-8356-4a29-9422-7e25033cd3fc}
+    client-id: ${MICROSOFT_CLIENT_ID}
     client-secret: ${MICROSOFT_CLIENT_SECRET}
-    tenant-id: ${MICROSOFT_TENANT_ID:b6260bc1-0228-4c6f-9881-15add8fb5383}
-    redirect-uri: ${MICROSOFT_REDIRECT_URI:https://instincthub-uat.fecredit.com.vn/WebClient/Saml2/Acs}
+    tenant-id: ${MICROSOFT_TENANT_ID}
+    redirect-uri: ${MICROSOFT_REDIRECT_URI}
     scope: "User.Read Chat.ReadWrite ChatMessage.Send offline_access"
     token-buffer-minutes: 5
     refresh-token-days: 90
