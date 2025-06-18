@@ -49,7 +49,7 @@ public class TeamsController {
     @PostMapping("/auth/set-tokens")
     public ResponseEntity<String> setTokensManually(@RequestBody SetTokensRequest request) {
         try {
-            // Trực tiếp update tokens vào TokenManager
+            // Update tokens directly into TokenManager
             tokenManager.setTokensDirectly(
                     request.getAccessToken(),
                     request.getRefreshToken()
