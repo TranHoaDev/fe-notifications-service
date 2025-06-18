@@ -82,7 +82,7 @@ public class MicrosoftGraphTokenManager implements TokenManager {
             }
 
             if (canRefreshToken()) {
-                log.info("Access token expired, refreshing...");
+                log.info("Access token expired or empty, fetching by refresh_token...");
                 refreshAccessToken();
                 return delegatedToken;
             }
